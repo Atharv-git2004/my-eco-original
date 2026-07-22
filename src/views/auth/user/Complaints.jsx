@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Send, AlertCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "react-toastify";
-import { AddComplaintApi } from "../../Redux/service/AllApi"; // Check this path matches your folder structure
+import { AddComplaintApi } from "../../../Redux/service/AllApi";
+import { BASE_URL } from "../../../Redux/service/baseUrl";
 
 function Complaints() {
   const [userData, setUserData] = useState(null);
