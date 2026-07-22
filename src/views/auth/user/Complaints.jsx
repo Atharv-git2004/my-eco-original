@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Send, AlertCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "react-toastify";
+// Import BASE_URL here. Adjust the path '../../' based on where this file is located in your project!
+import { BASE_URL } from "../../Redux/service/baseUrl";
 
 function Complaints() {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     subject: "",
     message: "",
@@ -18,14 +20,14 @@ function Complaints() {
     if (storedUser) {
       setUserData({
         userName: storedUser.userName || storedUser.name || "User",
-        userEmail: storedUser.userEmail || storedUser.email || ""
+        userEmail: storedUser.userEmail || storedUser.email || "",
       });
     }
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!userData || !userData.userEmail) {
       toast.error("Please login to submit a complaint");
       return;
@@ -43,7 +45,8 @@ function Complaints() {
     console.log("Sending to backend:", complaintPayload);
 
     try {
-      const response = await fetch("http://localhost:5000/api/complaints/add", {
+      // Replaced localhost with BASE_URL
+      const response = await fetch(`${BASE_URL}/api/complaints/add`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(complaintPayload),
@@ -68,7 +71,7 @@ function Complaints() {
   if (submitted) {
     return (
       <div className="container py-5 mt-5 text-center">
-        <div className="card border-0 shadow-sm p-5 mx-auto" style={{ maxWidth: '500px', borderRadius: '20px' }}>
+        <div className="card border-0 shadow-sm p-5 mx-auto" style={{ maxWidth: "500px", borderRadius: "20px" }}>
           <CheckCircle2 size={60} className="text-success mx-auto mb-4" />
           <h2 className="fw-bold">Thank You!</h2>
           <p className="text-muted">Your complaint has been successfully registered.</p>
@@ -84,7 +87,7 @@ function Complaints() {
     <div className="container py-5 mt-4">
       <div className="row justify-content-center">
         <div className="col-lg-6">
-          <div className="card border-0 shadow-lg p-4 p-md-5" style={{ borderRadius: '25px' }}>
+          <div className="card border-0 shadow-lg p-4 p-md-5" style={{ borderRadius: "25px" }}>
             <div className="text-center mb-4">
               <h2 className="fw-bold text-dark">Submit a Complaint</h2>
               <p className="text-muted small">Tell us what's wrong. We're here to help.</p>
@@ -99,23 +102,23 @@ function Complaints() {
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
                 <label className="form-label small fw-bold">Full Name</label>
-                <input 
-                  type="text" 
-                  className="form-control bg-light border-0 py-2" 
-                  value={userData?.userName || ""} 
-                  readOnly 
-                  disabled 
+                <input
+                  type="text"
+                  className="form-control bg-light border-0 py-2"
+                  value={userData?.userName || ""}
+                  readOnly
+                  disabled
                   placeholder="Login to see your name"
                 />
               </div>
 
               <div className="mb-3">
                 <label className="form-label small fw-bold">Subject</label>
-                <select 
+                <select
                   className="form-select border-light-subtle py-2 shadow-none"
                   required
                   value={formData.subject}
-                  onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 >
                   <option value="">Choose a reason...</option>
                   <option value="Delivery Issue">Delivery Issue</option>
@@ -128,22 +131,28 @@ function Complaints() {
 
               <div className="mb-4">
                 <label className="form-label small fw-bold">Message</label>
-                <textarea 
-                  className="form-control border-light-subtle shadow-none" 
-                  rows="4" 
+                <textarea
+                  className="form-control border-light-subtle shadow-none"
+                  rows="4"
                   placeholder="Describe your issue in detail..."
                   required
                   value={formData.message}
-                  onChange={(e) => setFormData({...formData, message: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 ></textarea>
               </div>
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="btn btn-success w-100 py-3 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm rounded-3"
                 disabled={loading || !userData}
               >
-                {loading ? "Sending..." : <><Send size={18} /> Submit Complaint</>}
+                {loading ? (
+                  "Sending..."
+                ) : (
+                  <>
+                    <Send size={18} /> Submit Complaint
+                  </>
+                )}
               </button>
             </form>
           </div>

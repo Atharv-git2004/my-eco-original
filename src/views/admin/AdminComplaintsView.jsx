@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { MessageSquare, Trash2, Eye, User, Mail, ShieldAlert } from "lucide-react";
 import { toast } from "react-toastify";
+// Import BASE_URL here. Adjust the path '../../' based on where this file is located!
+import { BASE_URL } from "../../Redux/service/baseUrl";
 
 function AdminComplaintsView() {
   const [complaints, setComplaints] = useState([]);
@@ -14,9 +16,10 @@ function AdminComplaintsView() {
   const fetchComplaints = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/complaints/all");
+      // Replaced localhost with BASE_URL
+      const response = await fetch(`${BASE_URL}/api/complaints/all`);
       const data = await response.json();
-      
+
       if (data.success) {
         setComplaints(data.complaints);
       } else {
@@ -33,13 +36,14 @@ function AdminComplaintsView() {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this complaint?")) {
       try {
-        const response = await fetch(`http://localhost:5000/api/complaints/delete/${id}`, { 
-            method: 'DELETE' 
+        // Replaced localhost with BASE_URL
+        const response = await fetch(`${BASE_URL}/api/complaints/delete/${id}`, {
+          method: "DELETE",
         });
         const data = await response.json();
-        
+
         if (data.success) {
-          setComplaints(complaints.filter(c => c._id !== id));
+          setComplaints(complaints.filter((c) => c._id !== id));
           toast.success("Complaint deleted successfully");
         } else {
           toast.error("Failed to delete complaint");
@@ -92,7 +96,10 @@ function AdminComplaintsView() {
                   <tr key={item._id} className="border-bottom">
                     <td className="px-4 py-3">
                       <div className="d-flex align-items-center gap-3">
-                        <div className="avatar-sm bg-success text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm" style={{width: '40px', height: '40px'}}>
+                        <div
+                          className="avatar-sm bg-success text-white rounded-circle d-flex align-items-center justify-content-center fw-bold shadow-sm"
+                          style={{ width: "40px", height: "40px" }}
+                        >
                           {item.userName ? item.userName[0].toUpperCase() : "U"}
                         </div>
                         <div>
@@ -109,19 +116,19 @@ function AdminComplaintsView() {
                       </span>
                     </td>
                     <td className="text-muted small">
-                      {new Date(item.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      {new Date(item.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
                     </td>
                     <td className="text-end px-4">
                       <div className="d-flex justify-content-end gap-2">
-                        <button 
+                        <button
                           className="btn btn-success-subtle text-success btn-sm rounded-3 px-2 border-0"
-                          data-bs-toggle="modal" 
+                          data-bs-toggle="modal"
                           data-bs-target="#complaintModal"
                           onClick={() => setSelectedComplaint(item)}
                         >
                           <Eye size={18} />
                         </button>
-                        <button 
+                        <button
                           className="btn btn-danger-subtle text-danger btn-sm rounded-3 px-2 border-0"
                           onClick={() => handleDelete(item._id)}
                         >
@@ -160,8 +167,12 @@ function AdminComplaintsView() {
               {selectedComplaint && (
                 <div className="d-flex flex-column gap-3">
                   <div className="p-3 bg-light rounded-3">
-                    <div className="fw-bold text-dark"><User size={16} /> {selectedComplaint.userName}</div>
-                    <div className="small text-muted"><Mail size={14} /> {selectedComplaint.userEmail}</div>
+                    <div className="fw-bold text-dark">
+                      <User size={16} /> {selectedComplaint.userName}
+                    </div>
+                    <div className="small text-muted">
+                      <Mail size={14} /> {selectedComplaint.userEmail}
+                    </div>
                   </div>
                   <div>
                     <div className="small text-muted fw-bold">SUBJECT:</div>
