@@ -138,7 +138,15 @@ export const AddReviewApi = async (id, reviewData, header) => {
 };
 
 // ==========================================
-// 7. ADMIN APIs
+// 7. COMPLAINTS MANAGEMENT
+// ==========================================
+
+export const AddComplaintApi = async (complaintData, header) => {
+  return await commonAPI("POST", `${BASE_URL}/api/complaints/add`, complaintData, header);
+};
+
+// ==========================================
+// 8. ADMIN APIs
 // ==========================================
 
 export const GetAdminStatsApi = async (header) => {
@@ -157,7 +165,6 @@ export const GetAllOrdersAdminApi = async (header) => {
   return await commonAPI("GET", `${BASE_URL}/api/admin/orders`, "", header);
 };
 
-// Fixed Route to properly append BASE_URL and match backend router path
 export const GetPendingProductsAdminApi = async (header) => {
   return await commonAPI("GET", `${BASE_URL}/api/admin/products/pending`, "", header);
 };

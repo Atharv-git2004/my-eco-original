@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Send, AlertCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "react-toastify";
-// നിങ്ങളുടെ ബിൽഡ് പാത്ത് അനുസരിച്ച് ഈ relative path ശരിയാണെന്ന് ഉറപ്പാക്കുക
-import { BASE_URL } from "../../Redux/service/baseUrl";
+import { BASE_URL } from "../Redux/service/baseUrl"; // നിങ്ങളുടെ ഫോൾഡർ സ്ട്രക്ചർ അനുസരിച്ച് ഇമ്പോർട്ട് പാത്ത് ശരിയാണെന്ന് ഉറപ്പാക്കുക
 
 function Complaints() {
   const [userData, setUserData] = useState(null);
@@ -48,7 +47,6 @@ function Complaints() {
       message: formData.message,
     };
 
-    // Session-ൽ നിന്ന് Token എടുക്കുന്നു (Backend Auth Middleware ഉണ്ടെങ്കിൽ ആവശ്യമാണ്)
     const token = sessionStorage.getItem("token") || localStorage.getItem("token");
 
     const headers = {
@@ -71,7 +69,6 @@ function Complaints() {
       if (response.ok && (data.success || response.status === 200 || response.status === 201)) {
         setLoading(false);
         setSubmitted(true);
-        // Form ഫീൽഡുകൾ ക്ലിയർ ചെയ്യുന്നു
         setFormData({ subject: "", message: "" });
         toast.success("Your complaint has been sent to the admin");
       } else {
@@ -84,7 +81,6 @@ function Complaints() {
     }
   };
 
-  // Complaint അയച്ചതിന് ശേഷമുള്ള Success Screen
   if (submitted) {
     return (
       <div className="container py-5 mt-5 text-center">
