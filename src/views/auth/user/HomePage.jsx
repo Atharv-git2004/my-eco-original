@@ -55,7 +55,7 @@ function HomePage() {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.2 },
+      transition: { staggerChildren: 0.15 },
     },
   };
 
@@ -66,9 +66,9 @@ function HomePage() {
         {/* Animated Background Elements */}
         <motion.div
           animate={{ scale: [1, 1.1, 1], rotate: [0, 90, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
           className="position-absolute bg-success rounded-circle opacity-25 blur-bg"
-          style={{ width: "600px", height: "600px", top: "-20%", right: "-10%", filter: "blur(100px)" }}
+          style={{ width: "600px", height: "600px", top: "-20%", right: "-10%", filter: "blur(120px)" }}
         />
 
         <div className="container position-relative z-1">
@@ -89,7 +89,7 @@ function HomePage() {
                   <span className="text-gradient-success position-relative">Nature's Magic</span>
                 </motion.h1>
 
-                <motion.p variants={fadeUp} className="lead text-secondary mb-5 fw-medium">
+                <motion.p variants={fadeUp} className="lead text-secondary mb-5 fw-medium pe-lg-4">
                   Experience the purest eco-friendly essentials. Carefully curated for a sustainable planet and a healthier,
                   radiant you.
                 </motion.p>
@@ -119,7 +119,7 @@ function HomePage() {
                     src="https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=1000&q=80"
                     alt="Eco Lifestyle"
                     className="img-fluid w-100 object-fit-cover hover-zoom"
-                    style={{ height: "600px" }}
+                    style={{ height: "550px" }}
                   />
                   <div className="overlay-gradient"></div>
                 </div>
@@ -172,7 +172,7 @@ function HomePage() {
       </div>
 
       {/* ================= PRODUCT GRID (SCROLL ANIMATED) ================= */}
-      <section className="py-5">
+      <section className="py-5 bg-white">
         <div className="container py-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -207,13 +207,13 @@ function HomePage() {
             ) : dbProducts.length ? (
               dbProducts.map((product, index) => (
                 <motion.div variants={fadeUp} className="col-sm-6 col-md-4 col-lg-3" key={product._id || index}>
-                  <div className="product-hover-wrapper h-100">
+                  <div className="h-100">
                     <ProductCard product={product} />
                   </div>
                 </motion.div>
               ))
             ) : (
-              <motion.div variants={fadeUp} className="text-center py-5 col-12 bg-white rounded-5 shadow-sm">
+              <motion.div variants={fadeUp} className="text-center py-5 col-12 bg-light rounded-5 shadow-sm">
                 <ShoppingBag size={48} className="text-muted mb-3 opacity-50" />
                 <h4 className="fw-bold text-dark">Out of Stock</h4>
                 <p className="text-muted">We're bringing fresh items soon.</p>
@@ -237,7 +237,7 @@ function HomePage() {
 
           <div className="row align-items-center position-relative z-1 py-4 px-lg-4">
             <div className="col-lg-6 mb-4 mb-lg-0 text-center text-lg-start">
-              <h2 className="display-4 fw-black mb-3">
+              <h2 className="display-5 fw-black mb-3">
                 Join The <br /> Green Revolution
               </h2>
               <p className="lead opacity-90 mb-0">
@@ -291,9 +291,11 @@ function HomePage() {
           transform: translateX(6px);
           transition: transform 0.3s ease;
         }
+        .hover-scale {
+          transition: transform 0.3s ease;
+        }
         .hover-scale:hover {
           transform: scale(1.05);
-          transition: transform 0.3s ease;
         }
 
         /* Image Effects */
@@ -342,14 +344,6 @@ function HomePage() {
           transform: scale(1.1) rotate(5deg);
         }
 
-        /* Product Hover */
-        .product-hover-wrapper {
-          transition: all 0.4s ease;
-        }
-        .product-hover-wrapper:hover {
-          transform: translateY(-8px);
-        }
-
         /* Newsletter Section */
         .animated-bg-gradient {
           background: linear-gradient(-45deg, #0f3e14, #1b5e20, #2e7d32, #1b5e20);
@@ -378,7 +372,7 @@ function HomePage() {
           100% { background-position: 0% 50%; }
         }
 
-        /* Responsive Fixes - THIS WAS THE CAUSE OF YOUR ERROR */
+        /* Responsive Fixes */
         @media (max-width: 768px) {
           .glass-card { margin-left: 0 !important; }
         }
