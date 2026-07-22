@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Send, AlertCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { AddComplaintApi } from "../../../Redux/service/AllApi";
-import { BASE_URL } from "../../../Redux/service/baseUrl";
 
 function Complaints() {
   const [userData, setUserData] = useState(null);
@@ -61,7 +60,7 @@ function Complaints() {
         };
 
     try {
-      // Using AllApi instead of standard fetch to ensure BASE_URL logic is followed
+      // Using AllApi to submit the complaint
       const response = await AddComplaintApi(complaintPayload, reqHeader);
 
       if (response.status >= 200 && response.status < 300) {
