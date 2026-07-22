@@ -138,15 +138,7 @@ export const AddReviewApi = async (id, reviewData, header) => {
 };
 
 // ==========================================
-// 7. COMPLAINTS MANAGEMENT
-// ==========================================
-
-export const AddComplaintApi = async (complaintData, header) => {
-  return await commonAPI("POST", `${BASE_URL}/api/complaints/add`, complaintData, header);
-};
-
-// ==========================================
-// 8. ADMIN APIs
+// 7. ADMIN APIs
 // ==========================================
 
 export const GetAdminStatsApi = async (header) => {
@@ -171,4 +163,12 @@ export const GetPendingProductsAdminApi = async (header) => {
 
 export const VerifyProductAdminApi = async (id, statusData, header) => {
   return await commonAPI("PATCH", `${BASE_URL}/api/products/approve/${id}`, statusData, header);
+};
+
+// ==========================================
+// 8. COMPLAINTS MANAGEMENT
+// ==========================================
+
+export const AddComplaintApi = async (complaintData, header) => {
+  return await commonAPI("POST", `${BASE_URL}/api/complaints/add`, complaintData, header);
 };

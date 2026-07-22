@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Send, AlertCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "react-toastify";
-import { BASE_URL } from "../Redux/service/baseUrl"; // നിങ്ങളുടെ ഫോൾഡർ സ്ട്രക്ചർ അനുസരിച്ച് ഇമ്പോർട്ട് പാത്ത് ശരിയാണെന്ന് ഉറപ്പാക്കുക
+import { AddComplaintApi } from "../../Redux/service/AllApi"; // Check this path matches your folder structure
 
 function Complaints() {
   const [userData, setUserData] = useState(null);
@@ -49,38 +49,38 @@ function Complaints() {
 
     const token = sessionStorage.getItem("token") || localStorage.getItem("token");
 
-    const headers = {
-      "Content-Type": "application/json",
-    };
-
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
+    // Header structure standard for your commonAPI
+    const reqHeader = token
+      ? {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        }
+      : {
+          "Content-Type": "application/json",
+        };
 
     try {
-      const response = await fetch(`${BASE_URL}/api/complaints/add`, {
-        method: "POST",
-        headers: headers,
-        body: JSON.stringify(complaintPayload),
-      });
+      // Using AllApi instead of standard fetch to ensure BASE_URL logic is followed
+      const response = await AddComplaintApi(complaintPayload, reqHeader);
 
-      const data = await response.json();
-
-      if (response.ok && (data.success || response.status === 200 || response.status === 201)) {
+      if (response.status >= 200 && response.status < 300) {
         setLoading(false);
         setSubmitted(true);
+        // Form ഫീൽഡുകൾ ക്ലിയർ ചെയ്യുന്നു
         setFormData({ subject: "", message: "" });
         toast.success("Your complaint has been sent to the admin");
       } else {
-        throw new Error(data.message || "Failed to submit complaint");
+        setLoading(false);
+        toast.error(response.response?.data?.message || "Failed to submit complaint");
       }
     } catch (error) {
       setLoading(false);
-      console.error("Submission Error:", error.message);
-      toast.error(error.message || "Failed to connect to backend server");
+      console.error("Submission Error:", error);
+      toast.error("Failed to connect to backend server");
     }
   };
 
+  // Complaint അയച്ചതിന് ശേഷമുള്ള Success Screen
   if (submitted) {
     return (
       <div className="container py-5 mt-5 text-center">
