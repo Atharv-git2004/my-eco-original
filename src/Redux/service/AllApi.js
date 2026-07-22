@@ -33,11 +33,10 @@ export const AddProductApi = async (product, header) => {
   return await commonAPI("POST", `${BASE_URL}/api/products/add`, product, header);
 };
 
-// 🔥 UPDATED FUNCTION: Added 'limit' parameter to fix loading lag
 export const GetAllProductsApi = async (searchKey = "", limit = "") => {
   let url = `${BASE_URL}/api/products?search=${searchKey}`;
   if (limit) {
-    url += `&limit=${limit}`; // 8 products mathram edukkan ulla logic
+    url += `&limit=${limit}`;
   }
   return await commonAPI("GET", url, "", "");
 };
@@ -158,8 +157,9 @@ export const GetAllOrdersAdminApi = async (header) => {
   return await commonAPI("GET", `${BASE_URL}/api/admin/orders`, "", header);
 };
 
+// Fixed Route to properly append BASE_URL and match backend router path
 export const GetPendingProductsAdminApi = async (header) => {
-  return await commonAPI("GET", `${BASE_URL}/api/products/admin/pending`, "", header);
+  return await commonAPI("GET", `${BASE_URL}/api/admin/products/pending`, "", header);
 };
 
 export const VerifyProductAdminApi = async (id, statusData, header) => {
