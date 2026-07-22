@@ -116,7 +116,7 @@ function HomePage() {
                 {/* Main Hero Image */}
                 <div className="image-wrapper rounded-5 shadow-lg overflow-hidden position-relative border border-4 border-white">
                   <img
-                    src="https://media.istockphoto.com/id/1344923073/photo/a-lake-in-the-shape-of-human-footprints-in-the-middle-of-a-lush-forest-as-a-metaphor-for-the.jpg?s=2048x2048&w=is&k=20&c=TReVwiNwsdBjkNvm3pzHKQK20Nxyblix_-ZSH8KcHGQ="
+                    src="https://static.vecteezy.com/system/resources/thumbnails/041/862/818/small_2x/ai-generated-hands-holding-globe-surrounded-by-green-leaves-environmental-conservation-concept-earth-day-eco-friendly-and-sustainable-living-photo.jpg"
                     alt="Eco Lifestyle"
                     className="img-fluid w-100 object-fit-cover hover-zoom"
                     style={{ height: "550px" }}
