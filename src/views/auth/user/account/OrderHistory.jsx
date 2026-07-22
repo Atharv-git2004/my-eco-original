@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Truck, CheckCircle, RefreshCw, ShoppingBag, ChevronRight, Clock } from "lucide-react";
 import axios from "axios";
-// Import BASE_URL here. Adjust the relative path ('../../') according to your folder structure!
-import { BASE_URL } from "../../Redux/service/baseUrl";
+// Fixed the relative path to properly reach the Redux folder from src/views/auth/user/account/
+import { BASE_URL } from "../../../../Redux/service/baseUrl";
 
 // Helper to render status badges
 function getStatusBadge(status) {
