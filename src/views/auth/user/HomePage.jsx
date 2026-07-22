@@ -116,7 +116,7 @@ function HomePage() {
                 {/* Main Hero Image */}
                 <div className="image-wrapper rounded-5 shadow-lg overflow-hidden position-relative border border-4 border-white">
                   <img
-                    src="https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?auto=format&fit=crop&w=1000&q=80"
+                    src="https://media.istockphoto.com/id/1344923073/photo/a-lake-in-the-shape-of-human-footprints-in-the-middle-of-a-lush-forest-as-a-metaphor-for-the.jpg?s=2048x2048&w=is&k=20&c=TReVwiNwsdBjkNvm3pzHKQK20Nxyblix_-ZSH8KcHGQ="
                     alt="Eco Lifestyle"
                     className="img-fluid w-100 object-fit-cover hover-zoom"
                     style={{ height: "550px" }}
