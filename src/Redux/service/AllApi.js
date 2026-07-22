@@ -6,23 +6,23 @@ import { BASE_URL } from "./baseUrl";
 // ==========================================
 
 export const RegistrationApi = async (user) => {
-  return await commonAPI("POST", `${BASE_URL}/api/users/register`, user, "");
+    return await commonAPI("POST", `${BASE_URL}/api/users/register`, user, "");
 };
 
 export const LoginApi = async (user) => {
-  return await commonAPI("POST", `${BASE_URL}/api/users/login`, user, "");
+    return await commonAPI("POST", `${BASE_URL}/api/users/login`, user, "");
 };
 
 export const GoogleLoginApi = async (userData) => {
-  return await commonAPI("POST", `${BASE_URL}/api/users/google-login`, userData, "");
+    return await commonAPI("POST", `${BASE_URL}/api/users/google-login`, userData, "");
 };
 
 export const GetUserProfileApi = async (header) => {
-  return await commonAPI("GET", `${BASE_URL}/api/profile/me`, "", header);
+    return await commonAPI("GET", `${BASE_URL}/api/profile/me`, "", header);
 };
 
 export const UpdateUserProfileApi = async (userData, header) => {
-  return await commonAPI("PUT", `${BASE_URL}/api/profile/profile`, userData, header);
+    return await commonAPI("PUT", `${BASE_URL}/api/profile/profile`, userData, header);
 };
 
 // ==========================================
@@ -30,32 +30,27 @@ export const UpdateUserProfileApi = async (userData, header) => {
 // ==========================================
 
 export const AddProductApi = async (product, header) => {
-  return await commonAPI("POST", `${BASE_URL}/api/products/add`, product, header);
+    return await commonAPI("POST", `${BASE_URL}/api/products/add`, product, header);
 };
 
-// 🔥 UPDATED FUNCTION: Added 'limit' parameter to fix loading lag
-export const GetAllProductsApi = async (searchKey = "", limit = "") => {
-  let url = `${BASE_URL}/api/products?search=${searchKey}`;
-  if (limit) {
-    url += `&limit=${limit}`; // 8 products mathram edukkan ulla logic
-  }
-  return await commonAPI("GET", url, "", "");
+export const GetAllProductsApi = async (searchKey = "") => {
+    return await commonAPI("GET", `${BASE_URL}/api/products?search=${searchKey}`, "", "");
 };
 
 export const GetProductByIdApi = async (id) => {
-  return await commonAPI("GET", `${BASE_URL}/api/products/single/${id}`, "", "");
+    return await commonAPI("GET", `${BASE_URL}/api/products/single/${id}`, "", "");
 };
 
 export const GetSellerProductsApi = async (header) => {
-  return await commonAPI("GET", `${BASE_URL}/api/products/seller/my-products`, "", header);
+    return await commonAPI("GET", `${BASE_URL}/api/products/seller/my-products`, "", header);
 };
 
 export const UpdateProductApi = async (id, productData, header) => {
-  return await commonAPI("PUT", `${BASE_URL}/api/products/update/${id}`, productData, header);
+    return await commonAPI("PUT", `${BASE_URL}/api/products/update/${id}`, productData, header);
 };
 
 export const DeleteProductApi = async (id, header) => {
-  return await commonAPI("DELETE", `${BASE_URL}/api/products/delete/${id}`, {}, header);
+    return await commonAPI("DELETE", `${BASE_URL}/api/products/delete/${id}`, {}, header);
 };
 
 // ==========================================
@@ -63,19 +58,19 @@ export const DeleteProductApi = async (id, header) => {
 // ==========================================
 
 export const AddToCartApi = async (cartData, header) => {
-  return await commonAPI("POST", `${BASE_URL}/api/cart/add`, cartData, header);
+    return await commonAPI("POST", `${BASE_URL}/api/cart/add`, cartData, header);
 };
 
 export const GetCartApi = async (header) => {
-  return await commonAPI("GET", `${BASE_URL}/api/cart`, "", header);
+    return await commonAPI("GET", `${BASE_URL}/api/cart`, "", header);
 };
 
 export const UpdateCartQtyApi = async (id, qtyData, header) => {
-  return await commonAPI("PATCH", `${BASE_URL}/api/cart/${id}`, qtyData, header);
+    return await commonAPI("PATCH", `${BASE_URL}/api/cart/${id}`, qtyData, header);
 };
 
 export const RemoveFromCartApi = async (productId, header) => {
-  return await commonAPI("DELETE", `${BASE_URL}/api/cart/${productId}`, {}, header);
+    return await commonAPI("DELETE", `${BASE_URL}/api/cart/${productId}`, {}, header);
 };
 
 // ==========================================
@@ -83,23 +78,23 @@ export const RemoveFromCartApi = async (productId, header) => {
 // ==========================================
 
 export const PlaceOrderApi = async (orderData, header) => {
-  return await commonAPI("POST", `${BASE_URL}/api/orders`, orderData, header);
+    return await commonAPI("POST", `${BASE_URL}/api/orders`, orderData, header);
 };
 
 export const GetMyOrdersApi = async (header) => {
-  return await commonAPI("GET", `${BASE_URL}/api/orders/myorders`, "", header);
+    return await commonAPI("GET", `${BASE_URL}/api/orders/myorders`, "", header);
 };
 
 export const GetSellerOrdersApi = async (header) => {
-  return await commonAPI("GET", `${BASE_URL}/api/seller/orders`, "", header);
+    return await commonAPI("GET", `${BASE_URL}/api/seller/orders`, "", header);
 };
 
 export const UpdateOrderStatusApi = async (orderId, statusData, header) => {
-  return await commonAPI("PUT", `${BASE_URL}/api/seller/orders/${orderId}/status`, statusData, header);
+    return await commonAPI("PUT", `${BASE_URL}/api/seller/orders/${orderId}/status`, statusData, header);
 };
 
 export const CancelOrderApi = async (orderId, header) => {
-  return await commonAPI("DELETE", `${BASE_URL}/api/orders/${orderId}`, {}, header);
+    return await commonAPI("DELETE", `${BASE_URL}/api/orders/${orderId}`, {}, header);
 };
 
 // ==========================================
@@ -107,19 +102,19 @@ export const CancelOrderApi = async (orderId, header) => {
 // ==========================================
 
 export const GetSellerProfileApi = async (header) => {
-  return await commonAPI("GET", `${BASE_URL}/api/seller/profile`, "", header);
+    return await commonAPI("GET", `${BASE_URL}/api/seller/profile`, "", header);
 };
 
 export const UpdateSellerProfileApi = async (sellerData, header) => {
-  return await commonAPI("POST", `${BASE_URL}/api/seller/profile`, sellerData, header);
+    return await commonAPI("POST", `${BASE_URL}/api/seller/profile`, sellerData, header);
 };
 
 export const GetSellerDashboardApi = async (header) => {
-  return await commonAPI("GET", `${BASE_URL}/api/seller/dashboard`, "", header);
+    return await commonAPI("GET", `${BASE_URL}/api/seller/dashboard`, "", header); 
 };
 
 export const GetSellerFinanceApi = async (header) => {
-  return await commonAPI("GET", `${BASE_URL}/api/seller/finance`, "", header);
+    return await commonAPI("GET", `${BASE_URL}/api/seller/finance`, "", header);
 };
 
 // ==========================================
@@ -127,15 +122,15 @@ export const GetSellerFinanceApi = async (header) => {
 // ==========================================
 
 export const ToggleWishlistApi = async (productId, header) => {
-  return await commonAPI("POST", `${BASE_URL}/api/wishlist/toggle`, { productId }, header);
+    return await commonAPI("POST", `${BASE_URL}/api/wishlist/toggle`, { productId }, header);
 };
 
 export const GetWishlistApi = async (header) => {
-  return await commonAPI("GET", `${BASE_URL}/api/wishlist`, "", header);
+    return await commonAPI("GET", `${BASE_URL}/api/wishlist`, "", header);
 };
 
 export const AddReviewApi = async (id, reviewData, header) => {
-  return await commonAPI("POST", `${BASE_URL}/api/products/${id}/reviews`, reviewData, header);
+    return await commonAPI("POST", `${BASE_URL}/api/products/${id}/reviews`, reviewData, header);
 };
 
 // ==========================================
@@ -143,25 +138,28 @@ export const AddReviewApi = async (id, reviewData, header) => {
 // ==========================================
 
 export const GetAdminStatsApi = async (header) => {
-  return await commonAPI("GET", `${BASE_URL}/api/admin/stats`, "", header);
+    return await commonAPI("GET", `${BASE_URL}/api/admin/stats`, "", header);
 };
 
 export const GetAllUsersAdminApi = async (header) => {
-  return await commonAPI("GET", `${BASE_URL}/api/admin/users`, "", header);
+    return await commonAPI("GET", `${BASE_URL}/api/admin/users`, "", header);
 };
 
 export const BlockUserAdminApi = async (id, header) => {
-  return await commonAPI("PATCH", `${BASE_URL}/api/admin/users/block/${id}`, {}, header);
+    return await commonAPI("PATCH", `${BASE_URL}/api/admin/users/block/${id}`, {}, header);
 };
 
 export const GetAllOrdersAdminApi = async (header) => {
-  return await commonAPI("GET", `${BASE_URL}/api/admin/orders`, "", header);
+    return await commonAPI("GET", `${BASE_URL}/api/admin/orders`, "", header);
 };
 
 export const GetPendingProductsAdminApi = async (header) => {
-  return await commonAPI("GET", `${BASE_URL}/api/products/admin/pending`, "", header);
+    return await commonAPI("GET", `${BASE_URL}/api/products/admin/pending`, "", header);
 };
 
 export const VerifyProductAdminApi = async (id, statusData, header) => {
-  return await commonAPI("PATCH", `${BASE_URL}/api/products/approve/${id}`, statusData, header);
+    return await commonAPI("PATCH", `${BASE_URL}/api/products/approve/${id}`, statusData, header);
 };
+
+
+///////////////////////////////////
