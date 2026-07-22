@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Send, AlertCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "react-toastify";
-// Import BASE_URL here. Adjust the path '../../' based on where this file is located in your project!
+// Make sure this relative path correctly points to your baseUrl.js file!
 import { BASE_URL } from "../../Redux/service/baseUrl";
 
 function Complaints() {
@@ -42,10 +42,9 @@ function Complaints() {
       message: formData.message,
     };
 
-    console.log("Sending to backend:", complaintPayload);
+    console.log("Sending to backend:", `${BASE_URL}/api/complaints/add`);
 
     try {
-      // Replaced localhost with BASE_URL
       const response = await fetch(`${BASE_URL}/api/complaints/add`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -64,7 +63,7 @@ function Complaints() {
     } catch (error) {
       setLoading(false);
       console.error("Submission Error:", error.message);
-      toast.error(error.message);
+      toast.error(error.message || "Failed to connect to backend server");
     }
   };
 
