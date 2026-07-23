@@ -56,7 +56,7 @@ const PublicRoute = ({ children }) => {
 
 function App() {
   // നിങ്ങളുടെ Google Cloud Console-ൽ നിന്നുള്ള Client ID ഇവിടെ നൽകുക
-  const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE";
+  const GOOGLE_CLIENT_ID = "30671830914-3vlfie9c5robgotp1s9rd31t98or96al.apps.googleusercontent.com";
 
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
