@@ -6,11 +6,7 @@ import { Leaf } from "lucide-react";
 import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
 
-import {
-  LoginApi,
-  RegistrationApi,
-  GoogleLoginApi,
-} from "../../Redux/service/AllApi";
+import { LoginApi, RegistrationApi, GoogleLoginApi } from "../../Redux/service/AllApi";
 
 function Authentication({ register }) {
   const navigate = useNavigate();
@@ -69,7 +65,7 @@ function Authentication({ register }) {
 
     if (!user.email || !user.password) {
       return toast.warning("Please fill all fields");
-    }    
+    }
 
     try {
       setLoading(true);
@@ -92,9 +88,7 @@ function Authentication({ register }) {
       }
     } catch (error) {
       console.error("Auth Error:", error);
-      toast.error(
-        error.response?.data?.message || "Server error. Please check backend."
-      );
+      toast.error(error.response?.data?.message || "Server error. Please check backend.");
     } finally {
       setLoading(false);
     }
@@ -108,25 +102,21 @@ function Authentication({ register }) {
       try {
         setLoading(true);
 
-        const userInfo = await axios.get(
-          "https://www.googleapis.com/oauth2/v3/userinfo",
-          {
-            headers: {
-              Authorization: `Bearer ${tokenResponse.access_token}`,
-            },
-          }
-        );
+        const userInfo = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+          headers: {
+            Authorization: `Bearer ${tokenResponse.access_token}`,
+          },
+        });
 
         const result = await GoogleLoginApi({
           email: userInfo.data.email,
           userName: userInfo.data.name,
           googleId: userInfo.data.sub,
-          picture: userInfo.data.picture, 
+          picture: userInfo.data.picture,
         });
 
         if (result.status === 200 || result.status === 201) {
           toast.success(`Welcome ${userInfo.data.name}`);
-          // Backend ensures 'picture' is included in the user object
           handleAuthSuccess(result.data);
         }
       } catch (error) {
@@ -148,9 +138,7 @@ function Authentication({ register }) {
           <Leaf size={32} color="#10b981" />
         </div>
 
-        <h2 style={styles.title}>
-          {register ? "Join EcoMarket" : "Welcome Back"}
-        </h2>
+        <h2 style={styles.title}>{register ? "Join EcoMarket" : "Welcome Back"}</h2>
 
         <form onSubmit={handleSubmit}>
           {register && (
@@ -185,10 +173,7 @@ function Authentication({ register }) {
               onChange={handleChange}
               required
             />
-            <span
-              style={styles.eye}
-              onClick={() => setShowPassword(!showPassword)}
-            >
+            <span style={styles.eye} onClick={() => setShowPassword(!showPassword)}>
               {showPassword ? <FaEyeSlash /> : <FaEye />}
             </span>
           </div>
@@ -200,16 +185,11 @@ function Authentication({ register }) {
 
         <div style={styles.or}>OR</div>
 
-        <button
-          type="button"
-          style={styles.googleBtn}
-          onClick={() => googleLogin()}
-          disabled={loading}
-        >
-          <img 
-            src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png" 
-            alt="google" 
-            style={{width: '20px', marginRight: '10px'}}
+        <button type="button" style={styles.googleBtn} onClick={() => googleLogin()} disabled={loading}>
+          <img
+            src="https://cdn1.iconfinder.com/data/icons/google-s-logo/150/Google_Icons-09-512.png"
+            alt="google"
+            style={{ width: "20px", marginRight: "10px" }}
           />
           Continue with Google
         </button>
@@ -227,16 +207,52 @@ function Authentication({ register }) {
 
 const styles = {
   container: { minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center", background: "#ecfdf5" },
-  card: { background: "#fff", padding: "40px", width: "100%", maxWidth: "420px", borderRadius: "18px", boxShadow: "0 10px 40px rgba(0,0,0,0.1)" },
+  card: {
+    background: "#fff",
+    padding: "40px",
+    width: "100%",
+    maxWidth: "420px",
+    borderRadius: "18px",
+    boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
+  },
   logo: { textAlign: "center", marginBottom: "10px" },
   title: { textAlign: "center", marginBottom: "20px", color: "#333", fontWeight: "700" },
-  input: { width: "100%", padding: "12px", marginBottom: "15px", borderRadius: "10px", border: "1px solid #ddd", outline: "none" },
+  input: {
+    width: "100%",
+    padding: "12px",
+    marginBottom: "15px",
+    borderRadius: "10px",
+    border: "1px solid #ddd",
+    outline: "none",
+  },
   eye: { position: "absolute", right: "15px", top: "14px", cursor: "pointer", color: "#666" },
-  mainBtn: { width: "100%", padding: "12px", background: "#10b981", color: "#fff", border: "none", borderRadius: "10px", fontWeight: "bold", cursor: "pointer", transition: "0.3s" },
-  googleBtn: { width: "100%", padding: "12px", borderRadius: "10px", border: "1px solid #ddd", marginTop: "10px", cursor: "pointer", display: 'flex', alignItems: 'center', justifyContent: 'center', background: "#fff", fontWeight: "500" },
+  mainBtn: {
+    width: "100%",
+    padding: "12px",
+    background: "#10b981",
+    color: "#fff",
+    border: "none",
+    borderRadius: "10px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    transition: "0.3s",
+  },
+  googleBtn: {
+    width: "100%",
+    padding: "12px",
+    borderRadius: "10px",
+    border: "1px solid #ddd",
+    marginTop: "10px",
+    cursor: "pointer",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background: "#fff",
+    fontWeight: "500",
+  },
   or: { textAlign: "center", margin: "15px 0", color: "#888", fontSize: "14px" },
   switch: { textAlign: "center", marginTop: "15px", color: "#666", fontSize: "14px" },
   link: { color: "#10b981", fontWeight: "bold", marginLeft: "5px", textDecoration: "none" },
 };
 
-export default Authentication;  
+export default Authentication;
