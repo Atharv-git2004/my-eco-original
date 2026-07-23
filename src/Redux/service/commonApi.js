@@ -8,8 +8,6 @@ export const commonAPI = async (httpRequest, url, reqBody = null, reqHeader = nu
     method: httpRequest,
     url,
     data: reqBody,
-    // ✅ Logic: If reqHeader is provided, use it.
-    // Otherwise, Axios handles headers automatically (better for FormData/Multer).
     headers: reqHeader ? reqHeader : { "Content-Type": "application/json" },
   };
 
@@ -22,13 +20,11 @@ export const commonAPI = async (httpRequest, url, reqBody = null, reqHeader = nu
     console.error("Method:", httpRequest);
 
     if (err.response) {
-      // The server responded with a status code (4xx, 5xx)
       console.error("Status Code:", err.response.status);
       console.error("Error Data:", err.response.data);
       console.groupEnd();
       return err.response;
     } else if (err.request) {
-      // The request was made but no response was received
       console.error("Network Error: No response from server. Is the backend running?");
       console.groupEnd();
       return {
@@ -39,7 +35,6 @@ export const commonAPI = async (httpRequest, url, reqBody = null, reqHeader = nu
         },
       };
     } else {
-      // Something happened in setting up the request
       console.error("Technical Error:", err.message);
       console.groupEnd();
       return {
