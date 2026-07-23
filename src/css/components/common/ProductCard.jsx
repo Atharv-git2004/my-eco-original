@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom"; // useNavigate ചേർത്തു
+import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, Heart } from "lucide-react";
 import { toast } from "react-toastify";
-import { ToggleWishlistApi } from "../../../Redux/service/AllApi";
+// 🟢 AddToCartApi കൂടി ഇംപോർട്ട് ചെയ്തു
+import { ToggleWishlistApi, AddToCartApi } from "../../../Redux/service/AllApi";
 
 function ProductCard({ product, wishlistItems, setWishlistItems }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const isOutOfStock = (product.stock ?? product.quantity) <= 0;
 
-  // Navigate ഉപയോഗിക്കാൻ
   const navigate = useNavigate();
 
   // Sync Heart color with the wishlist
@@ -19,48 +19,59 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
     }
   }, [product._id, wishlistItems]);
 
-  // 🛒 Add to Cart Logic
-  const handleAddToCart = (e) => {
+  // 🛒 Add to Cart Logic (API വഴി)
+  const handleAddToCart = async (e) => {
     e.preventDefault();
 
-    // --- LOGIN CHECK ADDED ---
     const token = sessionStorage.getItem("token") || localStorage.getItem("token");
+
+    // ലോഗിൻ ചെയ്തിട്ടില്ലെങ്കിൽ ലോഗിൻ പേജിലേക്ക് വിടും
     if (!token) {
       toast.warning("Please login to add items to cart!");
-      navigate("/login"); // ലോഗിൻ പേജിലേക്ക് പോകാൻ
+      navigate("/login");
       return;
     }
-    // -------------------------
 
-    const cart = JSON.parse(localStorage.getItem("cart")) || [];
-    const existingItem = cart.find((item) => item._id === product._id);
+    // 🟢 API-ലേക്ക് അയക്കാനുള്ള ബോഡിയും ഹെഡറും
+    const reqBody = {
+      productId: product._id,
+      quantity: 1,
+    };
 
-    if (existingItem) {
-      existingItem.qty += 1;
-      toast.info("Quantity updated in cart");
-    } else {
-      cart.push({ ...product, qty: 1 });
-      toast.success("Added to cart!");
+    const reqHeader = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+
+    try {
+      // 🟢 API കോൾ ചെയ്യുന്നു
+      const result = await AddToCartApi(reqBody, reqHeader);
+
+      // നിങ്ങളുടെ ബാക്കെൻഡ് റെസ്പോൺസ് അനുസരിച്ച് സ്റ്റാറ്റസ് കോഡ് മാറിയേക്കാം (200 അല്ലെങ്കിൽ 201)
+      if (result.status === 200 || result.status === 201) {
+        toast.success("Added to cart!");
+        // 🟢 ഹെഡറിനെ/നാവ്ബാറിനെ വിവരമറിയിക്കുന്നു (കാർട്ട് കൗണ്ട് മാറാൻ)
+        window.dispatchEvent(new Event("cartUpdated"));
+      } else {
+        toast.error(result.response?.data || "Failed to add product to cart");
+      }
+    } catch (error) {
+      console.error("Cart Error:", error);
+      toast.error("Something went wrong!");
     }
-
-    localStorage.setItem("cart", JSON.stringify(cart));
-    // 🟢 ഹെഡറിനെ വിവരമറിയിക്കുന്നു
-    window.dispatchEvent(new Event("cartUpdated"));
   };
 
   // ❤️ Wishlist Toggle Logic
   const handleWishlist = async (e) => {
     e.preventDefault();
 
-    // --- LOGIN CHECK ---
     const token = sessionStorage.getItem("token") || localStorage.getItem("token");
 
     if (!token) {
       toast.warning("Please login to manage your wishlist!");
-      navigate("/login"); // ലോഗിൻ പേജിലേക്ക് പോകാൻ
+      navigate("/login");
       return;
     }
-    // -------------------
 
     const reqHeader = {
       "Content-Type": "application/json",
@@ -71,20 +82,18 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
       const result = await ToggleWishlistApi(product._id, reqHeader);
 
       if (result.status === 200) {
-        // 🟢 Navbar-ന് വേണ്ടി LocalStorage-ലെ Wishlist അപ്‌ഡേറ്റ് ചെയ്യുന്നു
         let currentWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
         if (!isWishlisted) {
           toast.success("Added to wishlist!");
           setIsWishlisted(true);
-          currentWishlist.push(product); // Add to local storage
+          currentWishlist.push(product);
         } else {
           toast.info("Removed from wishlist");
           setIsWishlisted(false);
-          currentWishlist = currentWishlist.filter((item) => item._id !== product._id); // Remove from local storage
+          currentWishlist = currentWishlist.filter((item) => item._id !== product._id);
         }
 
-        // സേവ് ചെയ്ത ശേഷം ഹെഡറിനെ വിവരമറിയിക്കുന്നു
         localStorage.setItem("wishlist", JSON.stringify(currentWishlist));
         window.dispatchEvent(new Event("wishlistUpdated"));
       }
@@ -119,7 +128,7 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
         />
       </button>
 
-      {/* Clickable Image Container - FIXED IMAGE CROPPING */}
+      {/* Clickable Image Container */}
       <Link
         to={`/product/${product._id}`}
         className="image-container d-flex align-items-center justify-content-center overflow-hidden bg-white p-4"
