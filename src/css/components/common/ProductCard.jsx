@@ -31,6 +31,7 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
     }
 
     localStorage.setItem("cart", JSON.stringify(cart));
+    // 🟢 ഹെഡറിനെ വിവരമറിയിക്കുന്നു
     window.dispatchEvent(new Event("cartUpdated"));
   };
 
@@ -53,13 +54,21 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
       const result = await ToggleWishlistApi(product._id, reqHeader);
 
       if (result.status === 200) {
+        // 🟢 Navbar-ന് വേണ്ടി LocalStorage-ലെ Wishlist അപ്‌ഡേറ്റ് ചെയ്യുന്നു
+        let currentWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
         if (!isWishlisted) {
           toast.success("Added to wishlist!");
           setIsWishlisted(true);
+          currentWishlist.push(product); // Add to local storage
         } else {
           toast.info("Removed from wishlist");
           setIsWishlisted(false);
+          currentWishlist = currentWishlist.filter((item) => item._id !== product._id); // Remove from local storage
         }
+
+        // സേവ് ചെയ്ത ശേഷം ഹെഡറിനെ വിവരമറിയിക്കുന്നു
+        localStorage.setItem("wishlist", JSON.stringify(currentWishlist));
         window.dispatchEvent(new Event("wishlistUpdated"));
       }
     } catch (err) {

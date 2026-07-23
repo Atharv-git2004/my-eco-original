@@ -1,30 +1,46 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { 
-  ShoppingCart, User, Leaf, Heart, LogOut, Package, 
-  Instagram, Twitter, Facebook, Mail, MapPin, Menu, X, MessageSquare 
+import {
+  ShoppingCart,
+  User,
+  Leaf,
+  Heart,
+  LogOut,
+  Package,
+  Instagram,
+  Twitter,
+  Facebook,
+  Mail,
+  MapPin,
+  Menu,
+  X,
+  MessageSquare,
 } from "lucide-react";
 
 function UserHeader() {
   const navigate = useNavigate();
   const location = useLocation();
+
   const [cartCount, setCartCount] = useState(0);
   const [wishCount, setWishCount] = useState(0);
   const [userData, setUserData] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // Function to sync data from localStorage/sessionStorage
   const updateStoreData = () => {
     try {
+      // 1. Update Cart Count
       const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
-      const cCount = Array.isArray(savedCart) 
-        ? savedCart.reduce((total, item) => total + (Number(item.qty || item.quantity) || 1), 0) 
+      const cCount = Array.isArray(savedCart)
+        ? savedCart.reduce((total, item) => total + (Number(item.qty || item.quantity) || 1), 0)
         : 0;
       setCartCount(cCount);
 
+      // 2. Update Wishlist Count
       const savedWish = JSON.parse(localStorage.getItem("wishlist")) || [];
       setWishCount(Array.isArray(savedWish) ? savedWish.length : 0);
 
-      // സെഷനിൽ നിന്ന് യൂസർ വിവരങ്ങൾ എടുക്കുന്നു
+      // 3. Update User Data
       const user = JSON.parse(sessionStorage.getItem("user"));
       setUserData(user);
     } catch (error) {
@@ -32,11 +48,17 @@ function UserHeader() {
     }
   };
 
+  // Setup Event Listeners
   useEffect(() => {
+    // Initial Load
     updateStoreData();
+
+    // Listen for changes from other tabs and custom events from the current tab
     window.addEventListener("storage", updateStoreData);
     window.addEventListener("cartUpdated", updateStoreData);
     window.addEventListener("wishlistUpdated", updateStoreData);
+
+    // Cleanup listeners on unmount
     return () => {
       window.removeEventListener("storage", updateStoreData);
       window.removeEventListener("cartUpdated", updateStoreData);
@@ -44,21 +66,24 @@ function UserHeader() {
     };
   }, []);
 
-  useEffect(() => { setIsMobileMenuOpen(false); }, [location]);
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     if (window.confirm("Are you sure you want to logout?")) {
       sessionStorage.clear();
       setUserData(null);
       navigate("/");
-      window.location.reload(); 
+      window.location.reload();
     }
   };
 
   return (
     <nav className="navbar navbar-expand-lg sticky-top bg-white shadow-sm py-2 main-nav">
       <div className="container">
-        <Link className="navbar-brand d-flex align-items-center fw-black fs-3" to="/" style={{ letterSpacing: '-1.5px' }}>
+        <Link className="navbar-brand d-flex align-items-center fw-black fs-3" to="/" style={{ letterSpacing: "-1.5px" }}>
           <div className="bg-success text-white rounded-circle d-flex align-items-center justify-content-center me-2 shadow-sm brand-icon">
             <Leaf size={22} fill="currentColor" />
           </div>
@@ -66,47 +91,74 @@ function UserHeader() {
           <span className="text-success">Market</span>
         </Link>
 
-        <button className="navbar-toggler border-0 shadow-none" type="button" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+        <button
+          className="navbar-toggler border-0 shadow-none"
+          type="button"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
           {isMobileMenuOpen ? <X size={28} className="text-dark" /> : <Menu size={28} className="text-dark" />}
         </button>
 
-        <div className={`collapse navbar-collapse ${isMobileMenuOpen ? 'show' : ''}`}>
-          <ul className="navbar-nav mx-auto mb-2 mb-lg-0 fw-bold text-uppercase" style={{ fontSize: '13px' }}>
-            <li className="nav-item"><Link className={`nav-link px-3 ${location.pathname === '/products' ? 'text-success' : ''}`} to="/products">Shop</Link></li>
-            <li className="nav-item"><Link className={`nav-link px-3 ${location.pathname === '/about' ? 'text-success' : ''}`} to="/about">Our Story</Link></li>
-            <li className="nav-item"><Link className={`nav-link px-3 ${location.pathname === '/complaints' ? 'text-success' : ''}`} to="/complaints">Complaints</Link></li>
+        <div className={`collapse navbar-collapse ${isMobileMenuOpen ? "show" : ""}`}>
+          <ul className="navbar-nav mx-auto mb-2 mb-lg-0 fw-bold text-uppercase" style={{ fontSize: "13px" }}>
+            <li className="nav-item">
+              <Link className={`nav-link px-3 ${location.pathname === "/products" ? "text-success" : ""}`} to="/products">
+                Shop
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link className={`nav-link px-3 ${location.pathname === "/about" ? "text-success" : ""}`} to="/about">
+                Our Story
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link
+                className={`nav-link px-3 ${location.pathname === "/complaints" ? "text-success" : ""}`}
+                to="/complaints"
+              >
+                Complaints
+              </Link>
+            </li>
           </ul>
 
-          <div className="d-flex align-items-center gap-2 gap-md-3">
+          <div className="d-flex align-items-center gap-2 gap-md-3 mt-3 mt-lg-0">
+            {/* Wishlist Icon */}
             <Link to="/wishlist" className="nav-icon-btn position-relative" title="Wishlist">
               <Heart size={22} className={wishCount > 0 ? "text-danger" : ""} fill={wishCount > 0 ? "#dc3545" : "none"} />
               {wishCount > 0 && <span className="count-badge bg-danger animate-bounce">{wishCount}</span>}
             </Link>
 
+            {/* Cart Icon */}
             <Link to="/cart" className="nav-icon-btn position-relative" title="Cart">
               <ShoppingCart size={22} />
               {cartCount > 0 && <span className="count-badge bg-success">{cartCount}</span>}
             </Link>
 
-            <div className="vr mx-2 d-none d-md-block opacity-10" style={{ height: '20px' }}></div>
+            <div className="vr mx-2 d-none d-lg-block opacity-10" style={{ height: "20px" }}></div>
 
+            {/* User Profile / Login */}
             {userData ? (
               <div className="dropdown">
-                <button className="user-profile-btn dropdown-toggle border-0 shadow-sm p-1 pe-3" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  {/* ✅ UPDATE: ഗൂഗിൾ ചിത്രം ഉണ്ടോ എന്ന് പരിശോധിക്കുന്നു. 
-                      ചിത്രം ലോഡ് ആകാൻ referrerPolicy ചേർത്തിട്ടുണ്ട്. */}
+                <button
+                  className="user-profile-btn dropdown-toggle border-0 shadow-sm p-1 pe-3"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
                   {userData.picture ? (
-                    <img 
-                      src={userData.picture} 
-                      alt="profile" 
-                      className="rounded-circle shadow-sm" 
+                    <img
+                      src={userData.picture}
+                      alt="profile"
+                      className="rounded-circle shadow-sm"
                       referrerPolicy="no-referrer"
-                      style={{ width: '32px', height: '32px', objectFit: 'cover', border: '2px solid #10b981' }} 
+                      style={{ width: "32px", height: "32px", objectFit: "cover", border: "2px solid #10b981" }}
                     />
                   ) : (
                     <div className="avatar shadow-sm">{userData.userName?.charAt(0).toUpperCase()}</div>
                   )}
-                  <span className="d-none d-md-inline ms-2 small fw-bold text-white">Hi, {userData.userName?.split(' ')[0]}</span>
+                  <span className="d-none d-md-inline ms-2 small fw-bold text-white">
+                    Hi, {userData.userName?.split(" ")[0]}
+                  </span>
                 </button>
                 <ul className="dropdown-menu dropdown-menu-end border-0 shadow-lg p-2 mt-2 rounded-4 animate-slide-in">
                   <li>
@@ -119,9 +171,14 @@ function UserHeader() {
                       <MessageSquare size={16} className="me-2" /> File a Complaint
                     </Link>
                   </li>
-                  <li><hr className="dropdown-divider opacity-50" /></li>
                   <li>
-                    <button className="dropdown-item text-danger rounded-3 py-2 d-flex align-items-center gap-2 fw-bold" onClick={handleLogout}>
+                    <hr className="dropdown-divider opacity-50" />
+                  </li>
+                  <li>
+                    <button
+                      className="dropdown-item text-danger rounded-3 py-2 d-flex align-items-center gap-2 fw-bold"
+                      onClick={handleLogout}
+                    >
                       <LogOut size={16} /> Logout
                     </button>
                   </li>
@@ -140,19 +197,21 @@ function UserHeader() {
 }
 
 const UserFooter = () => (
-  <footer className="footer-section bg-dark text-white pt-5 mt-auto" style={{ borderRadius: '40px 40px 0 0' }}>
+  <footer className="footer-section bg-dark text-white pt-5 mt-auto" style={{ borderRadius: "40px 40px 0 0" }}>
     <div className="container">
       <div className="row g-5 pb-5">
         <div className="col-lg-4 col-md-6">
           <h4 className="fw-bold text-white mb-4 d-flex align-items-center">
             <Leaf size={28} className="text-success me-2" /> EcoMarket
           </h4>
-          <p className="text-secondary mb-4 lh-lg" style={{ fontSize: '15px' }}>
+          <p className="text-secondary mb-4 lh-lg" style={{ fontSize: "15px" }}>
             Kerala's pioneer in ethical commerce. Join us in our journey towards a zero-waste lifestyle.
           </p>
           <div className="d-flex gap-3">
             {[Instagram, Twitter, Facebook].map((Icon, i) => (
-              <a key={i} href="#" className="social-link shadow-sm"><Icon size={18} /></a>
+              <a key={i} href="#" className="social-link shadow-sm">
+                <Icon size={18} />
+              </a>
             ))}
           </div>
         </div>
@@ -160,24 +219,36 @@ const UserFooter = () => (
         <div className="col-lg-2 col-md-3 col-6">
           <h6 className="text-white fw-bold mb-4 small text-uppercase tracking-wider">Quick Shop</h6>
           <ul className="list-unstyled footer-links">
-            <li><Link to="/products">All Products</Link></li>
-            <li><Link to="/about">Our Story</Link></li>
+            <li>
+              <Link to="/products">All Products</Link>
+            </li>
+            <li>
+              <Link to="/about">Our Story</Link>
+            </li>
           </ul>
         </div>
 
         <div className="col-lg-2 col-md-3 col-6">
           <h6 className="text-white fw-bold mb-4 small text-uppercase tracking-wider">Support</h6>
           <ul className="list-unstyled footer-links">
-            <li><Link to="/my-orders">Track Orders</Link></li>
-            <li><Link to="/complaints">File a Complaint</Link></li>
+            <li>
+              <Link to="/my-orders">Track Orders</Link>
+            </li>
+            <li>
+              <Link to="/complaints">File a Complaint</Link>
+            </li>
           </ul>
         </div>
 
         <div className="col-lg-4 col-md-12">
           <h6 className="text-white fw-bold mb-4 small text-uppercase tracking-wider">Stay Connected</h6>
           <div className="contact-info small text-secondary mt-3">
-              <div className="d-flex align-items-center gap-2 mb-2"><Mail size={14} className="text-success" /> hello@ecomarket.in</div>
-              <div className="d-flex align-items-center gap-2"><MapPin size={14} className="text-success" /> Kozhikode, Kerala</div>
+            <div className="d-flex align-items-center gap-2 mb-2">
+              <Mail size={14} className="text-success" /> hello@ecomarket.in
+            </div>
+            <div className="d-flex align-items-center gap-2">
+              <MapPin size={14} className="text-success" /> Kozhikode, Kerala
+            </div>
           </div>
         </div>
       </div>
@@ -191,7 +262,7 @@ const UserFooter = () => (
 
 function UserLayout({ children }) {
   return (
-    <div className="d-flex flex-column min-vh-100" style={{ backgroundColor: '#fdfdfd' }}>
+    <div className="d-flex flex-column min-vh-100" style={{ backgroundColor: "#fdfdfd" }}>
       <UserHeader />
       <main className="flex-grow-1">{children}</main>
       <UserFooter />
