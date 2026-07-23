@@ -30,8 +30,12 @@ function CartPage() {
     try {
       const result = await GetCartApi(reqHeader);
       if (result && result.status === 200) {
-        const items = result.data.items || result.data.products || result.data || [];
-        setCartItems(Array.isArray(items) ? items : []);
+        let items = result.data.items || result.data.products || result.data || [];
+
+        // 🟢 സുരക്ഷാ മാറ്റം: അഡ്മിൻ പ്രൊഡക്റ്റ് ഡിലീറ്റ് ചെയ്തിട്ടുണ്ടെങ്കിൽ അത് കാർട്ടിൽ എറർ വരുത്താതിരിക്കാൻ
+        items = Array.isArray(items) ? items.filter((item) => item.productId != null) : [];
+
+        setCartItems(items);
       } else {
         setCartItems([]);
       }
@@ -53,13 +57,16 @@ function CartPage() {
     const token = sessionStorage.getItem("token") || localStorage.getItem("token");
     if (!token) return;
 
-    const reqHeader = { Authorization: `Bearer ${token}` };
+    const reqHeader = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
 
     try {
       const result = await RemoveFromCartApi(itemId, reqHeader);
       if (result && (result.status === 200 || result.status === 204)) {
         toast.info("Item removed from cart");
-        fetchCart();
+        fetchCart(); // ഡിലീറ്റ് ചെയ്ത ശേഷം കാർട്ട് പുതുക്കുന്നു
         window.dispatchEvent(new Event("cartUpdated"));
       }
     } catch (err) {
@@ -73,7 +80,7 @@ function CartPage() {
     if (!item) return;
 
     const currentQty = item.quantity || item.qty || 1;
-    const newQty = Math.max(1, currentQty + amount);
+    const newQty = Math.max(1, currentQty + amount); // എണ്ണം 1-ൽ താഴെ പോകാതിരിക്കാൻ
 
     const token = sessionStorage.getItem("token") || localStorage.getItem("token");
     if (!token) return;
@@ -86,10 +93,11 @@ function CartPage() {
     try {
       const result = await UpdateCartQtyApi(itemId, { quantity: newQty }, reqHeader);
       if (result && result.status === 200) {
-        fetchCart();
+        fetchCart(); // എണ്ണം മാറ്റിയ ശേഷം കാർട്ട് പുതുക്കുന്നു
       }
     } catch (err) {
-      console.error(err);
+      console.error("Failed to update quantity:", err);
+      toast.error("Failed to update quantity");
     }
   };
 
@@ -243,17 +251,17 @@ function CartPage() {
 
       {/* Styles */}
       <style>{`
-                .fw-black { font-weight: 900; }
-                .grid-header { display: grid; grid-template-columns: 2fr 1fr 1fr; }
-                .hover-shadow:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.08) !important; }
-                .hover-scale:hover { transform: scale(1.03); }
-                .hover-success:hover { color: #198754 !important; }
-                .transition { transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); }
-                .img-hover-container:hover .cart-item-img { transform: scale(1.1); }
-                .animate-fade-in { animation: fadeIn 0.6s ease-out; }
-                @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-                @media (max-width: 768px) { .btn-xl { width: 100%; } }
-            `}</style>
+        .fw-black { font-weight: 900; }
+        .grid-header { display: grid; grid-template-columns: 2fr 1fr 1fr; }
+        .hover-shadow:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.08) !important; }
+        .hover-scale:hover { transform: scale(1.03); }
+        .hover-success:hover { color: #198754 !important; }
+        .transition { transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); }
+        .img-hover-container:hover .cart-item-img { transform: scale(1.1); }
+        .animate-fade-in { animation: fadeIn 0.6s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 768px) { .btn-xl { width: 100%; } }
+      `}</style>
     </div>
   );
 }
