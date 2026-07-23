@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // useNavigate ചേർത്തു
 import { ShoppingCart, Heart } from "lucide-react";
 import { toast } from "react-toastify";
 import { ToggleWishlistApi } from "../../../Redux/service/AllApi";
@@ -7,6 +7,9 @@ import { ToggleWishlistApi } from "../../../Redux/service/AllApi";
 function ProductCard({ product, wishlistItems, setWishlistItems }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const isOutOfStock = (product.stock ?? product.quantity) <= 0;
+
+  // Navigate ഉപയോഗിക്കാൻ
+  const navigate = useNavigate();
 
   // Sync Heart color with the wishlist
   useEffect(() => {
@@ -19,6 +22,16 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
   // 🛒 Add to Cart Logic
   const handleAddToCart = (e) => {
     e.preventDefault();
+
+    // --- LOGIN CHECK ADDED ---
+    const token = sessionStorage.getItem("token") || localStorage.getItem("token");
+    if (!token) {
+      toast.warning("Please login to add items to cart!");
+      navigate("/login"); // ലോഗിൻ പേജിലേക്ക് പോകാൻ
+      return;
+    }
+    // -------------------------
+
     const cart = JSON.parse(localStorage.getItem("cart")) || [];
     const existingItem = cart.find((item) => item._id === product._id);
 
@@ -38,12 +51,16 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
   // ❤️ Wishlist Toggle Logic
   const handleWishlist = async (e) => {
     e.preventDefault();
-    const token = sessionStorage.getItem("token");
+
+    // --- LOGIN CHECK ---
+    const token = sessionStorage.getItem("token") || localStorage.getItem("token");
 
     if (!token) {
-      toast.warning("Please login to manage your wishlist");
+      toast.warning("Please login to manage your wishlist!");
+      navigate("/login"); // ലോഗിൻ പേജിലേക്ക് പോകാൻ
       return;
     }
+    // -------------------
 
     const reqHeader = {
       "Content-Type": "application/json",
@@ -165,7 +182,6 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
         .transition-img { 
           transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1); 
         }
-        /* scale(1.08) പകരം ഇമേജ് അധികം zoom ആവാതിരിക്കാൻ scale(1.05) ആക്കി */
         .product-card:hover .transition-img { 
           transform: scale(1.08); 
         }

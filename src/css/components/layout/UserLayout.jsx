@@ -29,19 +29,28 @@ function UserHeader() {
   // Function to sync data from localStorage/sessionStorage
   const updateStoreData = () => {
     try {
-      // 1. Update Cart Count
-      const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
-      const cCount = Array.isArray(savedCart)
-        ? savedCart.reduce((total, item) => total + (Number(item.qty || item.quantity) || 1), 0)
-        : 0;
-      setCartCount(cCount);
+      // 1. Update Cart Count (Checking both localStorage & sessionStorage)
+      const savedCart = JSON.parse(localStorage.getItem("cart")) || JSON.parse(sessionStorage.getItem("cart")) || [];
+
+      if (Array.isArray(savedCart)) {
+        const cCount = savedCart.reduce((total, item) => {
+          const q = Number(item.qty || item.quantity) || 1;
+          return total + q;
+        }, 0);
+        setCartCount(cCount);
+      } else {
+        setCartCount(0);
+      }
 
       // 2. Update Wishlist Count
-      const savedWish = JSON.parse(localStorage.getItem("wishlist")) || [];
+      const savedWish =
+        JSON.parse(localStorage.getItem("wishlist")) || JSON.parse(sessionStorage.getItem("wishlist")) || [];
+
       setWishCount(Array.isArray(savedWish) ? savedWish.length : 0);
 
       // 3. Update User Data
-      const user = JSON.parse(sessionStorage.getItem("user"));
+      const user = JSON.parse(sessionStorage.getItem("user")) || JSON.parse(localStorage.getItem("user"));
+
       setUserData(user);
     } catch (error) {
       console.error("Header sync error:", error);
@@ -50,15 +59,12 @@ function UserHeader() {
 
   // Setup Event Listeners
   useEffect(() => {
-    // Initial Load
     updateStoreData();
 
-    // Listen for changes from other tabs and custom events from the current tab
     window.addEventListener("storage", updateStoreData);
     window.addEventListener("cartUpdated", updateStoreData);
     window.addEventListener("wishlistUpdated", updateStoreData);
 
-    // Cleanup listeners on unmount
     return () => {
       window.removeEventListener("storage", updateStoreData);
       window.removeEventListener("cartUpdated", updateStoreData);
@@ -66,15 +72,24 @@ function UserHeader() {
     };
   }, []);
 
-  // Close mobile menu when route changes
+  // Location / Route മാറുമ്പോൾ കൗണ്ട് സ്വയംSync ആവാനും മൊബൈൽ മെനു ക്ലോസ് ചെയ്യാനും
   useEffect(() => {
     setIsMobileMenuOpen(false);
+    updateStoreData();
   }, [location.pathname]);
 
   const handleLogout = () => {
     if (window.confirm("Are you sure you want to logout?")) {
+      // Clear both storage completely
       sessionStorage.clear();
+      localStorage.removeItem("cart");
+      localStorage.removeItem("wishlist");
+      localStorage.removeItem("user");
+
       setUserData(null);
+      setCartCount(0);
+      setWishCount(0);
+
       navigate("/");
       window.location.reload();
     }
