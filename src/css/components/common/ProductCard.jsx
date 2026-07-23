@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, Heart } from "lucide-react";
+import { ShoppingCart, Heart, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
-// 🟢 AddToCartApi കൂടി ഇംപോർട്ട് ചെയ്തു
 import { ToggleWishlistApi, AddToCartApi } from "../../../Redux/service/AllApi";
 
 function ProductCard({ product, wishlistItems, setWishlistItems }) {
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const isOutOfStock = (product.stock ?? product.quantity) <= 0;
 
   const navigate = useNavigate();
 
-  // Sync Heart color with the wishlist
   useEffect(() => {
     if (wishlistItems) {
       const exists = wishlistItems.some((item) => item._id === product._id);
@@ -19,20 +18,19 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
     }
   }, [product._id, wishlistItems]);
 
-  // 🛒 Add to Cart Logic (API വഴി)
   const handleAddToCart = async (e) => {
     e.preventDefault();
 
     const token = sessionStorage.getItem("token") || localStorage.getItem("token");
 
-    // ലോഗിൻ ചെയ്തിട്ടില്ലെങ്കിൽ ലോഗിൻ പേജിലേക്ക് വിടും
     if (!token) {
       toast.warning("Please login to add items to cart!");
       navigate("/login");
       return;
     }
 
-    // 🟢 API-ലേക്ക് അയക്കാനുള്ള ബോഡിയും ഹെഡറും
+    setIsAddingToCart(true); // Show immediate loading feedback
+
     const reqBody = {
       productId: product._id,
       quantity: 1,
@@ -44,13 +42,10 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
     };
 
     try {
-      // 🟢 API കോൾ ചെയ്യുന്നു
       const result = await AddToCartApi(reqBody, reqHeader);
 
-      // നിങ്ങളുടെ ബാക്കെൻഡ് റെസ്പോൺസ് അനുസരിച്ച് സ്റ്റാറ്റസ് കോഡ് മാറിയേക്കാം (200 അല്ലെങ്കിൽ 201)
       if (result.status === 200 || result.status === 201) {
         toast.success("Added to cart!");
-        // 🟢 ഹെഡറിനെ/നാവ്ബാറിനെ വിവരമറിയിക്കുന്നു (കാർട്ട് കൗണ്ട് മാറാൻ)
         window.dispatchEvent(new Event("cartUpdated"));
       } else {
         toast.error(result.response?.data || "Failed to add product to cart");
@@ -58,10 +53,11 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
     } catch (error) {
       console.error("Cart Error:", error);
       toast.error("Something went wrong!");
+    } finally {
+      setIsAddingToCart(false);
     }
   };
 
-  // ❤️ Wishlist Toggle Logic
   const handleWishlist = async (e) => {
     e.preventDefault();
 
@@ -72,6 +68,10 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
       navigate("/login");
       return;
     }
+
+    // Optimistic UI Update: Change color instantly before API call finishes
+    const previousState = isWishlisted;
+    setIsWishlisted(!previousState);
 
     const reqHeader = {
       "Content-Type": "application/json",
@@ -84,20 +84,24 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
       if (result.status === 200) {
         let currentWishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
 
-        if (!isWishlisted) {
+        if (!previousState) {
           toast.success("Added to wishlist!");
-          setIsWishlisted(true);
           currentWishlist.push(product);
         } else {
           toast.info("Removed from wishlist");
-          setIsWishlisted(false);
           currentWishlist = currentWishlist.filter((item) => item._id !== product._id);
         }
 
         localStorage.setItem("wishlist", JSON.stringify(currentWishlist));
         window.dispatchEvent(new Event("wishlistUpdated"));
+      } else {
+        // Revert UI if API fails
+        setIsWishlisted(previousState);
+        toast.error("Failed to update wishlist");
       }
     } catch (err) {
+      // Revert UI if there is an error
+      setIsWishlisted(previousState);
       console.error("Wishlist Toggle Error", err);
       toast.error("Failed to update wishlist");
     }
@@ -105,7 +109,6 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
 
   return (
     <div className="card product-card border-0 shadow-sm rounded-4 overflow-hidden position-relative h-100 transition-all bg-white">
-      {/* Status Badges */}
       <div className="position-absolute top-0 start-0 m-3 z-3">
         {isOutOfStock ? (
           <span className="badge bg-danger px-3 py-2 rounded-pill shadow-sm">Out of Stock</span>
@@ -114,7 +117,6 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
         )}
       </div>
 
-      {/* Wishlist Button */}
       <button
         onClick={handleWishlist}
         className="btn btn-white btn-wishlist position-absolute top-0 end-0 m-3 z-3 rounded-circle shadow-sm border-0 bg-white p-2 transition hover-scale"
@@ -124,11 +126,11 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
           style={{
             fill: isWishlisted ? "#dc3545" : "none",
             color: isWishlisted ? "#dc3545" : "#6c757d",
+            transition: "fill 0.2s ease, color 0.2s ease", // Smooth instant transition
           }}
         />
       </button>
 
-      {/* Clickable Image Container */}
       <Link
         to={`/product/${product._id}`}
         className="image-container d-flex align-items-center justify-content-center overflow-hidden bg-white p-4"
@@ -141,7 +143,6 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
         />
       </Link>
 
-      {/* Product Details */}
       <div className="card-body p-4 text-start d-flex flex-column justify-content-between">
         <div>
           <p
@@ -157,7 +158,6 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
           </Link>
         </div>
 
-        {/* Price and Cart Button Section */}
         <div className="d-flex justify-content-between align-items-end mt-3">
           <div className="d-flex flex-column">
             {product.oldPrice && (
@@ -169,11 +169,11 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
           <button
             onClick={handleAddToCart}
             className="btn btn-success rounded-circle p-2 shadow-sm hover-scale border-0 d-flex align-items-center justify-content-center"
-            disabled={isOutOfStock}
+            disabled={isOutOfStock || isAddingToCart}
             title="Add to Cart"
             style={{ width: "42px", height: "42px" }}
           >
-            <ShoppingCart size={20} />
+            {isAddingToCart ? <Loader2 size={20} className="spin-animation" /> : <ShoppingCart size={20} />}
           </button>
         </div>
       </div>
@@ -206,6 +206,13 @@ function ProductCard({ product, wishlistItems, setWishlistItems }) {
           -webkit-box-orient: vertical;
           overflow: hidden;
           line-height: 1.4;
+        }
+        .spin-animation {
+          animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
       `}</style>
     </div>

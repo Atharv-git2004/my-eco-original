@@ -16,6 +16,7 @@ import {
   X,
   MessageSquare,
 } from "lucide-react";
+import { GetCartApi } from "../../../Redux/service/AllApi"; // Ensure this path is correct for your file structure
 
 function UserHeader() {
   const navigate = useNavigate();
@@ -26,31 +27,51 @@ function UserHeader() {
   const [userData, setUserData] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Function to sync data from localStorage/sessionStorage
-  const updateStoreData = () => {
-    try {
-      // 1. Update Cart Count (Checking both localStorage & sessionStorage)
-      const savedCart = JSON.parse(localStorage.getItem("cart")) || JSON.parse(sessionStorage.getItem("cart")) || [];
+  // Fetch cart count from the backend API
+  const fetchCartCount = async () => {
+    const token = sessionStorage.getItem("token") || localStorage.getItem("token");
 
-      if (Array.isArray(savedCart)) {
-        const cCount = savedCart.reduce((total, item) => {
-          const q = Number(item.qty || item.quantity) || 1;
+    if (!token) {
+      setCartCount(0);
+      return;
+    }
+
+    try {
+      const reqHeader = {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      };
+
+      const result = await GetCartApi(reqHeader);
+
+      if (result && result.status === 200) {
+        let items = result.data.items || result.data.products || result.data || [];
+        items = Array.isArray(items) ? items.filter((item) => item.productId != null) : [];
+
+        // Calculate total quantity
+        const cCount = items.reduce((total, item) => {
+          const q = Number(item.quantity || item.qty) || 1;
           return total + q;
         }, 0);
+
         setCartCount(cCount);
       } else {
         setCartCount(0);
       }
+    } catch (error) {
+      console.error("Header cart sync error:", error);
+      setCartCount(0);
+    }
+  };
 
-      // 2. Update Wishlist Count
+  // Sync user and wishlist data from local/session storage
+  const updateStoreData = () => {
+    try {
       const savedWish =
         JSON.parse(localStorage.getItem("wishlist")) || JSON.parse(sessionStorage.getItem("wishlist")) || [];
-
       setWishCount(Array.isArray(savedWish) ? savedWish.length : 0);
 
-      // 3. Update User Data
       const user = JSON.parse(sessionStorage.getItem("user")) || JSON.parse(localStorage.getItem("user"));
-
       setUserData(user);
     } catch (error) {
       console.error("Header sync error:", error);
@@ -60,27 +81,32 @@ function UserHeader() {
   // Setup Event Listeners
   useEffect(() => {
     updateStoreData();
+    fetchCartCount();
 
-    window.addEventListener("storage", updateStoreData);
-    window.addEventListener("cartUpdated", updateStoreData);
-    window.addEventListener("wishlistUpdated", updateStoreData);
+    const handleStorageChange = () => updateStoreData();
+    const handleCartUpdate = () => fetchCartCount();
+    const handleWishlistUpdate = () => updateStoreData();
+
+    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener("cartUpdated", handleCartUpdate);
+    window.addEventListener("wishlistUpdated", handleWishlistUpdate);
 
     return () => {
-      window.removeEventListener("storage", updateStoreData);
-      window.removeEventListener("cartUpdated", updateStoreData);
-      window.removeEventListener("wishlistUpdated", updateStoreData);
+      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener("cartUpdated", handleCartUpdate);
+      window.removeEventListener("wishlistUpdated", handleWishlistUpdate);
     };
   }, []);
 
-  // Location / Route മാറുമ്പോൾ കൗണ്ട് സ്വയംSync ആവാനും മൊബൈൽ മെനു ക്ലോസ് ചെയ്യാനും
+  // Sync data and close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
     updateStoreData();
+    fetchCartCount();
   }, [location.pathname]);
 
   const handleLogout = () => {
     if (window.confirm("Are you sure you want to logout?")) {
-      // Clear both storage completely
       sessionStorage.clear();
       localStorage.removeItem("cart");
       localStorage.removeItem("wishlist");

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingBag, Plus, Minus, ArrowLeft, CreditCard } from "lucide-react";
+import { ShoppingBag, Plus, Minus, ArrowLeft } from "lucide-react";
 import { toast } from "react-toastify";
 import { GetCartApi, RemoveFromCartApi, UpdateCartQtyApi } from "../../../Redux/service/AllApi";
 
@@ -99,23 +99,6 @@ function CartPage() {
       console.error("Failed to update quantity:", err);
       toast.error("Failed to update quantity");
     }
-  };
-
-  // Calculate total amount
-  const calculateTotal = () => {
-    return cartItems.reduce((acc, item) => {
-      const product = item.productId || item;
-      const price = Number(product.price || item.price) || 0;
-      const qty = item.quantity || item.qty || 1;
-      return acc + price * qty;
-    }, 0);
-  };
-
-  // Checkout
-  const handleCheckout = () => {
-    if (cartItems.length === 0) return;
-    sessionStorage.setItem("checkoutItems", JSON.stringify(cartItems));
-    navigate("/checkout");
   };
 
   return (
@@ -225,25 +208,6 @@ function CartPage() {
                   );
                 })}
               </div>
-
-              {/* Footer */}
-              <div className="bg-white rounded-5 p-4 p-md-5 shadow-sm border animate-fade-in mt-5">
-                <div className="row align-items-center">
-                  <div className="col-md-6 text-start">
-                    <h3 className="fw-bold mb-1">Total Amount</h3>
-                    <p className="text-muted mb-0">Ready to complete your sustainable purchase?</p>
-                  </div>
-                  <div className="col-md-6 text-md-end mt-4 mt-md-0">
-                    <h1 className="fw-black text-success display-4 mb-3">₹{calculateTotal().toLocaleString()}</h1>
-                    <button
-                      onClick={handleCheckout}
-                      className="btn btn-success btn-xl w-100 w-md-auto px-5 py-3 rounded-pill fw-bold shadow-lg d-flex align-items-center justify-content-center gap-2 transition hover-scale"
-                    >
-                      <CreditCard size={20} /> CHECKOUT NOW
-                    </button>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         )}
@@ -260,7 +224,6 @@ function CartPage() {
         .img-hover-container:hover .cart-item-img { transform: scale(1.1); }
         .animate-fade-in { animation: fadeIn 0.6s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @media (max-width: 768px) { .btn-xl { width: 100%; } }
       `}</style>
     </div>
   );
